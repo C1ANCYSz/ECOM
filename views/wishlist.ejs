@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Wishlist</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <style>
+      .wishlist-section {
+        padding: 40px 20px;
+        text-align: center;
+      }
+
+      .wishlist-section h2 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+      }
+
+      .wishlist-grid {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center; /* Center the cards */
+        gap: 20px; /* Add space between cards */
+      }
+
+      .wishlist-card {
+        display: flex;
+        flex-direction: row; /* Align image and details side by side */
+        background-color: #222;
+        border: 1px solid var(--main-color);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        text-align: left; /* Align text to the left */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        max-width: 600px; /* Set a maximum width */
+        width: 100%; /* Ensure it doesn't exceed parent width */
+        margin: 0 auto;
+      }
+
+      .wishlist-card img {
+        max-width: 150px; /* Adjust image size as needed */
+        margin-right: 20px; /* Add space between image and details */
+      }
+
+      .wishlist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .wishlist-card h3 {
+        font-size: 1.25rem;
+        color: #fff;
+        margin: 10px 0;
+      }
+
+      .wishlist-card p {
+        color: #fff;
+        font-weight: bold;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        display: inline-block;
+        margin-top: 10px;
+        padding: 10px 15px;
+        left: 0;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        color: white;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-primary {
+        background-color: #3498db;
+      }
+
+      .btn-primary:hover {
+        background-color: #2980b9;
+      }
+
+      .btn-secondary {
+        background-color: #e74c3c;
+        margin-right: 10px;
+      }
+
+      .btn-secondary:hover {
+        background-color: #c0392b;
+      }
+
+      .footer {
+        background-color: #2c3e50;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        position: relative;
+      }
+
+      .empty-wishlist-message {
+        font-size: 1.2rem;
+        color: #888;
+      }
+
+      .empty-wishlist-message a {
+        color: #3498db;
+        text-decoration: underline;
+      }
+
+      .empty-wishlist-message a:hover {
+        color: #2980b9;
+      }
+      .rr {
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/main/header', { user: user }); %>
+    <div id="toast-container"></div>
+    <section class="wishlist-section" style="margin-top: 68px">
+      <h2>Your Wishlist</h2>
+      <% if (products.length > 0) { %>
+      <div class="wishlist-grid">
+        <% products.forEach(item => { %>
+        <div class="wishlist-card" id="wishlist-item-<%= item.id %>">
+          <a href="/products/<%=item._id%>">
+            <img src="<%= item.image %>" alt="<%= item.name %>" class="rr" />
+          </a>
+          <div>
+            <h3><a href="/products/<%=item._id%>"><%= item.name %></a></h3>
+            <p>$<%=item.price %></p>
+            <a
+              href="#"
+              class="btn-secondary"
+              onclick="addToCartFromWishlist('<%= item.id%>', 1)"
+              ><i class="bx bxs-cart"></i> Move to Cart</a
+            >
+            <a
+              href="#"
+              onclick="removeFromWishlist('<%= item.id %>')"
+              class="btn-secondary"
+              style="background-color: #c0392b"
+              ><i class="bx bx-x"></i>
+            </a>
+          </div>
+        </div>
+        <% }) %>
+      </div>
+      <% } else { %>
+      <p class="empty-wishlist-message">
+        Your wishlist is empty. <a href="/shop">Explore products now!</a>
+      </p>
+      <% } %>
+    </section>
+    <%- include('partials/main/footer') %>
+
+    <script>
+      function addToCartFromWishlist(productId, quantity) {
+        fetch('/cart/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: productId, quantity: quantity }),
+        })
+          .then((response) => {
+            if (!response.ok) throw new Error('Failed to add item to cart');
+            return response.json();
+          })
+          .then(() => {
+            // After adding to cart, remove from wishlist
+            return fetch(`/wishlist/remove/${productId}`, {
+              method: 'DELETE',
+            });
+          })
+          .then((response) => {
+            if (!response.ok)
+              throw new Error('Failed to remove item from wishlist');
+            // Remove item from UI
+            const wishlistItem = document.getElementById(
+              `wishlist-item-${productId}`
+            );
+            if (wishlistItem) wishlistItem.remove();
+            showToast(
+              'Item moved to cart and removed from wishlist',
+              'success'
+            );
+          })
+          .catch((error) => {
+            showToast('Error moving item. Please try again.', 'error');
+            console.error('Error:', error);
+          });
+      }
+
+      function removeFromWishlist(productId) {
+        fetch(`/wishlist/remove/${productId}`, {
+          method: 'DELETE',
+        })
+          .then((response) => {
+            if (!response.ok)
+              throw new Error('Failed to remove item from wishlist');
+            // Remove item from UI
+            const wishlistItem = document.getElementById(
+              `wishlist-item-${productId}`
+            );
+            if (wishlistItem) wishlistItem.remove();
+            showToast('Item removed from wishlist', 'success');
+          })
+          .catch((error) => {
+            showToast('Error removing item. Please try again.', 'error');
+            console.error('Error:', error);
+          });
+      }
+    </script>
+  </body>
+</html>

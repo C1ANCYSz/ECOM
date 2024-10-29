@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: 'Arial', sans-serif;
+        background-color: #555;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      .profile-container {
+        background-color: var(--nd-bg-color);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        padding: 30px;
+        max-width: 600px;
+        width: 90%;
+        text-align: center;
+        transition: transform 0.3s;
+      }
+
+      .profile-container:hover {
+        transform: translateY(-5px);
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        color: #fff;
+        margin-bottom: 20px;
+      }
+
+      .profile-details {
+        margin-bottom: 30px;
+      }
+
+      .profile-details img {
+        border-radius: 50%;
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid var(--main-color);
+      }
+
+      .profile-details p {
+        font-size: 1.1rem;
+        color: #fff;
+        margin: 5px 0;
+      }
+
+      .profile-actions {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 20px;
+      }
+
+      .btn-primary,
+      .btn-secondary {
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        text-decoration: none;
+        color: #fff;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+      }
+
+      .btn-primary {
+        background-color: #ffa41c;
+      }
+
+      .btn-primary:hover {
+        background-color: #cc8400;
+        transform: translateY(-2px);
+      }
+
+      .btn-secondary {
+        background-color: #e91e63;
+      }
+
+      .btn-secondary:hover {
+        background-color: #c2185b;
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 600px) {
+        h1 {
+          font-size: 2rem;
+        }
+
+        .profile-details p {
+          font-size: 1rem;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+          width: 100%;
+          margin: 5px 0;
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/main/header', { user: user }); %>
+    <div class="profile-container">
+      <h1>Welcome, <%= user.name %>!</h1>
+      <div class="profile-details">
+        <h2>Your Profile Information</h2>
+        <img style="height: 100px" src="<%= user.img %>" alt="User Image" />
+        <p><strong>Name:</strong> <%= user.name %></p>
+        <p><strong>Email:</strong> <%= user.email %></p>
+        <p><strong>Address:</strong> <%= user.address[0] %></p>
+        <p>
+          <strong>Member Since :</strong>
+          <%= user.createdAt ? new
+          Date(user.createdAt).toLocaleDateString("en-US", { year: 'numeric',
+          month: 'long', day: 'numeric' }) : "Date not available" %>
+        </p>
+      </div>
+
+      <div class="profile-actions">
+        <a href="/edit-profile" class="btn-primary">Edit Profile</a>
+        <a href="/orders" class="btn-primary">Orders</a>
+        <a href="/logout" class="btn-secondary">Logout</a>
+      </div>
+    </div>
+  </body>
+</html>

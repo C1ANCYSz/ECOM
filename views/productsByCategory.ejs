@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title> </title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <!-- Link to your CSS file -->
+
+    <style>
+      .category-title {
+        text-align: center;
+        margin-top: 50px;
+        font-size: 2rem;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation bar with categories -->
+
+    <%- include('partials/main/header', { user: user }); %>
+
+    <nav
+      class="category-nav"
+      style="
+        background: var(--nd-bg-color);
+
+        margin-top: 78px;
+        margin-left: 30px;
+        margin-right: 30px;
+      "
+    >
+      <ul class="category-list">
+        <li>
+          <a href="/products/category/all">
+            <i class="fas fa-box"></i>
+            all categories
+          </a>
+        </li>
+
+        <% categories.forEach(cat => { %>
+        <li>
+          <a href="/products/category/<%= cat %>">
+            <i class="bx bxs-cart"></i>
+            <%= cat %>
+          </a>
+        </li>
+        <% }) %>
+      </ul>
+    </nav>
+    <h2 class="category-title"><%= category %></h2>
+    <%- include('partials/productGrid/productGrid', { products , user}); %>
+
+    <div id="toast-container"></div>
+    <script src="/utils/frontFuncs.js"></script>
+  </body>
+</html>

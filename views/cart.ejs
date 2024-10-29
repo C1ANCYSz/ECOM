@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <style>
+      .flexme {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: row;
+      }
+      .plmn {
+        border: 1px solid #fff;
+        border-radius: 4px;
+        padding: 4px;
+        transition: background-color 0.3s;
+      }
+      .plmn:hover {
+        background-color: var(--main-dark);
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/main/header', { user: user }); %>
+    <div class="flexy">
+      <section class="cart-section">
+        <h2><%= products.length %> items</h2>
+        <% if (products.length > 0) { %>
+        <table class="cart-table"></table>
+          <thead>
+            <tr>
+              <th>Img</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach((item, index) => { %>
+            <tr data-index="<%= index %>">
+              <td>
+                <img src="<%= item.image %>" alt="<%= item.name %>" style="width: 100px" />
+              </td>
+              <td>
+                <a href="/products/<%=item.id%>"><%= item.name %> </a>
+              </td>
+              <td>
+                <div class="flexme">
+                  <i class="bx bx-minus plmn" style="font-weight: 900" onclick="decreaseQuantity('<%= index %>', '<%= item.price %>')"></i>
+                  <label id="quantity-label-<%= index %>" style="margin: 0 10px; color: white"><%= item.quantity %></label>
+                  <i class="bx bx-plus plmn" onclick="increaseQuantity('<%= index %>', '<%= item.price %>')"></i>
+                </div>
+              </td>
+              <td>$<%= item.price %></td>
+              <td id="total-<%= index %>">$<%= (item.price * item.quantity).toFixed(2) %></td>
+              <td>
+                <button onclick="deleteItem('<%= index %>');" class="btn-secondary">
+                  <i class="bx bx-x"></i>
+                </button>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% } else { %>
+        <p>Your cart is empty. <a href="/">Start shopping now!</a></p>
+        <% } %>
+      </section>
+      <section class="total-section">
+        <h3>
+          Total Amount: $<span id="grand-total"><%= products.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2) %></span>
+        </h3>
+        <button onclick="proceedToCheckout();" class="btn-primary">Proceed to Checkout</button>
+      </section>
+    </div>
+    <div id="toast-container"></div>
+    <script src="/utils/frontFuncs.js"></script>
+    <%- include('partials/main/footer', { user: user }); %>
+   
+    <script>
+      const products = <%- JSON.stringify(products) %> || [];
+      function proceedToCheckout() {
+        const cartItems = products.map((item, index) => {
+          const quantity = parseInt(document.getElementById(`quantity-label-${index}`).textContent);
+          return { productId: item._id, quantity: quantity };
+        });
+        const grandTotal = parseFloat(document.getElementById('grand-total').textContent);
+        if (products.length === 0) {
+          return showToast("Your cart is empty. Please add items to proceed to checkout.","error");
+        } else {
+          window.location.href = "/checkout";
+        }
+      }
+      function updateTotal(index, price) {
+        const quantity = document.getElementById('quantity-' + index).value;
+        const total = price * quantity;
+        document.getElementById('total-' + index).textContent = '$' + total.toFixed(2);
+        const productId = products[index]._id;
+        let grandTotal = 0;
+        products.forEach((item, index) => {
+          const quantity = document.getElementById(`quantity-${index}`).value;
+          grandTotal += item.price * quantity;
+        });
+        document.getElementById('grand-total').textContent = grandTotal.toFixed(2);
+        fetch('/cart/updateQty', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: productId, quantity: quantity }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Failed to update quantity on the server');
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log('Quantity updated successfully:', data);
+          })
+          .catch((error) => {
+            console.error('Error updating quantity:', error);
+          });
+      }
+      function increaseQuantity(index, price) {
+        let quantityLabel = document.getElementById('quantity-label-' + index);
+        let currentQuantity = parseInt(quantityLabel.textContent);
+        if (currentQuantity < 10) {
+          currentQuantity += 1;
+          quantityLabel.textContent = currentQuantity;
+          updateTotal(index, price);
+        }
+      }
+      function decreaseQuantity(index, price) {
+        let quantityLabel = document.getElementById('quantity-label-' + index);
+        let currentQuantity = parseInt(quantityLabel.textContent);
+        if (currentQuantity > 1) {
+          currentQuantity -= 1;
+          quantityLabel.textContent = currentQuantity;
+          updateTotal(index, price);
+        }
+      }
+      function updateTotal(index, price) {
+        const quantity = parseInt(document.getElementById('quantity-label-' + index).textContent);
+        const total = price * quantity;
+        document.getElementById('total-' + index).textContent = '$' + total.toFixed(2);
+        let grandTotal = 0;
+        products.forEach((item, i) => {
+          const itemQuantity = parseInt(document.getElementById(`quantity-label-${i}`).textContent);
+          grandTotal += item.price * itemQuantity;
+        });
+        document.getElementById('grand-total').textContent = grandTotal.toFixed(2);
+        const productId = products[index]._id;
+        fetch('/cart/updateQty', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId: productId, quantity: quantity }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Failed to update quantity on the server');
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log('Quantity updated successfully:', data);
+          })
+          .catch((error) => {
+            console.error('Error updating quantity:', error);
+          });
+      }
+      function deleteItem(index) {
+        const productId = products[index].id;
+        fetch(`/cart/remove/${productId}`, { method: 'DELETE' })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error("Failed to remove item from the server.");
+            }
+            console.log("Item deleted successfully on server");
+            products.splice(index, 1);
+            let grandTotal = products.reduce((acc, item) => acc + item.price * item.quantity, 0);
+            document.getElementById('grand-total').textContent = grandTotal.toFixed(2);
+            const itemRow = document.querySelector(`tr[data-index="${index}"]`);
+            if (itemRow) itemRow.remove();
+            document.querySelectorAll('.cart-table tbody tr').forEach((row, i) => {
+              row.setAttribute('data-index', i);
+            });
+            showToast("Item removed from the cart", "success");
+          })
+          .catch(error => {
+            console.error("Error deleting item:", error);
+          });
+      }
+    </script>
+  </body>
+</html>

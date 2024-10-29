@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Orders</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <style>
+      body {
+        font-family: 'poppins', sans-serif;
+        margin: 20px;
+        background-color: var(--bg-color);
+      }
+      .order-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 20px;
+      }
+      .order-card {
+        background-color: var(--nd-bg-color);
+        border: 2px solid var(--main-color);
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .order-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+      }
+      .order-id {
+        font-weight: bold;
+        color: #f2f2f2;
+      }
+      .order-total,
+      .order-status {
+        font-weight: bold;
+        color: #4caf50; /* Green for status */
+      }
+      .order-products {
+        margin-top: 10px;
+      }
+      .product-item {
+        background-color: var(--bg-color);
+        border: 2px solid var(--main-color);
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 5px;
+      }
+      .empty-message {
+        text-align: center;
+        font-size: 18px;
+        color: #666;
+      }
+
+      .flx {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/main/header', { user: user }); %>
+
+    <h1>Order List</h1>
+
+    <div class="order-container">
+      <% if (orders.length > 0) { %> <% orders.forEach(order => { %>
+      <div class="order-card">
+        <div class="order-header">
+          <span class="order-id">Order ID: <%= order._id %></span>
+          <span class="order-status">Status: <%= order.status %></span>
+        </div>
+        <div class="order-products">
+          <h3>Products:</h3>
+          <% order.products.forEach(product => { %>
+          <div class="product-item">
+            <div class="flx">
+              <div class="product-image">
+                <!-- Assuming you have a URL for the product image -->
+                <img
+                  src="<%= product.productId.image %>"
+                  alt="<%= product.productId.name %>"
+                  style="height: 100px"
+                />
+              </div>
+              <div class="product-details">
+                <a href="/products/<%= product.productId._id %>">
+                  <h4><%= product.productId.name %></h4></a
+                >
+                <p>
+                  Price:
+                  <strong>$<%= product.productId.price.toFixed(2) %></strong>
+                </p>
+                <p>Quantity: <%= product.quantity %></p>
+              </div>
+            </div>
+          </div>
+          <% }) %>
+        </div>
+
+        <div class="order-total">Total: $<%= order.total.toFixed(2) %></div>
+        <div>Date: <%= order.createdAt.toDateString() %></div>
+      </div>
+      <% }) %> <% } else { %>
+      <p class="empty-message">No orders found.</p>
+      <% } %>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signup</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Signup</h2>
+      <form id="signupForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required />
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required />
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required />
+
+        <label for="confirmPassword">Confirm Password:</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          required
+        />
+
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="password" id="phoneNumber" name="phoneNumber" required />
+
+        <button type="submit">Signup</button>
+      </form>
+      <div id="signupMessage"></div>
+    </div>
+
+    <script>
+      document
+        .getElementById('signupForm')
+        .addEventListener('submit', async function (e) {
+          e.preventDefault();
+
+          const signupData = {
+            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            confirmPassword: document.getElementById('confirmPassword').value,
+            phoneNumber: document.getElementById('phoneNumber').value,
+          };
+
+          try {
+            const response = await fetch('/auth/signup', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(signupData),
+            });
+
+            const result = await response.text();
+            document.getElementById('signupMessage').innerText = response.ok
+              ? 'Signup successful! Please log in.'
+              : `Signup failed: ${result}`;
+
+            // Redirect to the login page if signup is successful
+            if (response.ok) {
+              window.location.href = '/';
+            }
+          } catch (error) {
+            document.getElementById('signupMessage').innerText =
+              'An error occurred. Please try again.';
+          }
+        });
+    </script>
+  </body>
+</html>

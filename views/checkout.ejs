@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <style>
+      .flexme {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+      }
+      .checkout {
+        background-color: var(--nd-bg-color);
+        padding: 40px 0;
+        margin: 100px 40px 40px 40px;
+        border-radius: 20px;
+        border: 2px solid var(--main-dark);
+      }
+      .address,
+      .paymentMethod {
+        background: var(--bg-color);
+        padding: 10px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .address.selected,
+      .paymentMethod.selected {
+        background-color: var(--main-color);
+      }
+      .address:hover,
+      .paymentMethod:hover {
+        background-color: var(--main-color);
+      }
+      .new-address-input {
+        display: none;
+        margin-top: 10px;
+      }
+      .total-section {
+        border: 2px solid var(--main-dark);
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/main/header', { user: user }); %>
+    <section class="checkout">
+      <div class="flexme">
+        <section class="total-section">
+          <% address.forEach((e, index) => { %>
+          <div class="address" onclick="selectAddress('<%= e %>', this)">
+            <%= e %>
+          </div>
+          <% }) %>
+          <div class="address" onclick="toggleNewAddressInput()">
+            + add a new address
+          </div>
+          <input
+            type="text"
+            id="new-address"
+            class="new-address-input"
+            placeholder="Enter new address"
+          />
+          <button
+            id="submit-new-address"
+            class="new-address-input"
+            onclick="submitNewAddress()"
+          >
+            Submit
+          </button>
+        </section>
+        <section class="total-section">
+          <h1>Choose payment method</h1>
+          <div class="paymentMethod" onclick="selectPaymentMethod('COD', this)">
+            COD
+          </div>
+          <div
+            class="paymentMethod"
+            onclick="selectPaymentMethod('STRIPE', this)"
+          >
+            STRIPE
+          </div>
+        </section>
+        <section class="total-section">
+          <h3>
+            Total Amount: $<span id="grand-total">
+              <%= products.reduce((acc, item) => acc + item.price *
+              item.quantity, 0).toFixed(2) %>
+            </span>
+            <span style="color: rgb(194, 194, 194)">inc. VAT</span>
+          </h3>
+          <button
+            onclick="placeOrder()"
+            class="btn-primary"
+            style="font-weight: 700; font-size: large"
+          >
+            Place Order
+          </button>
+        </section>
+      </div>
+      <section class="cart-section" style="border: 2px solid var(--main-color)">
+        <h2><%= products.length %> items</h2>
+        <% if (products.length > 0) { %>
+        <table class="cart-table" style="left: 0">
+          <thead>
+            <tr>
+              <th>Img</th>
+              <th>Product</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach((item, index) => { %>
+            <tr>
+              <td>
+                <img
+                  src="<%= item.image %>"
+                  alt="<%= item.name %>"
+                  style="width: 100px"
+                />
+              </td>
+              <td><a href="/products/<%=item.id%>"><%= item.name %></a></td>
+              <td>
+                <div class="flexme">
+                  <p id="quantity-label-<%= index %>"><%= item.quantity %></p>
+                </div>
+              </td>
+              <td>$<%= item.price %></td>
+              <td id="total-<%= index %>">
+                $<%= (item.price * item.quantity).toFixed(2) %>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% } else { %>
+        <p>Your cart is empty. <a href="/shop">Start shopping now!</a></p>
+        <% } %>
+      </section>
+    </section>
+    <footer class="footer">
+      <p>&copy; 2024 MyShop. All rights reserved.</p>
+    </footer>
+    <div id="toast-container"></div>
+    <script src="/utils/frontFuncs.js"></script>
+    <script>
+      const products = <%- JSON.stringify(products) %> || [];
+      let selectedAddress = '';
+      let selectedPaymentMethod = '';
+      function toggleNewAddressInput() {
+        const newAddressInput = document.getElementById('new-address');
+        const submitButton = document.getElementById('submit-new-address');
+        if (newAddressInput.style.display === 'none') {
+          newAddressInput.style.display = 'block';
+          submitButton.style.display = 'inline-block';
+        } else {
+          newAddressInput.style.display = 'none';
+          submitButton.style.display = 'none';
+        }
+      }
+      function submitNewAddress() {
+        const newAddress = document.getElementById('new-address').value.trim();
+        if (newAddress) {
+          fetch('/customer/add-address', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ address: newAddress }),
+          })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Failed to add address');
+              }
+              return response.json();
+            })
+            .then(data => {
+              const addressList = document.querySelector('.total-section');
+              const newAddressDiv = document.createElement('div');
+              newAddressDiv.className = 'address';
+              newAddressDiv.textContent = newAddress;
+              newAddressDiv.onclick = function() { selectAddress(newAddress, this); };
+              const addNewAddressDiv = document.querySelector('.address:last-child');
+              addressList.insertBefore(newAddressDiv, addNewAddressDiv);
+              toggleNewAddressInput();
+              document.getElementById('new-address').value = '';
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              showToast('Failed to add address', 'error');
+            });
+        } else {
+          showToast('Please enter an address.', 'error');
+        }
+      }
+      function selectAddress(address, element) {
+        document.querySelectorAll('.address').forEach(addr => addr.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedAddress = address;
+      }
+      function selectPaymentMethod(method, element) {
+        document.querySelectorAll('.paymentMethod').forEach(pm => pm.classList.remove('selected'));
+        element.classList.add('selected');
+        selectedPaymentMethod = method;
+      }
+      function placeOrder() {
+        const cartItems = products.map((item, index) => {
+          const quantity = parseInt(document.getElementById(`quantity-label-${index}`).textContent);
+          return {
+            productId: item._id,
+            quantity: quantity,
+          };
+        });
+        const selectedAddress = document.querySelector('.address.selected')?.textContent.trim();
+        if (!selectedAddress) {
+          showToast('Please select an address.','error');
+          return;
+        }
+        const selectedPaymentMethod = document.querySelector('.paymentMethod.selected')?.textContent.trim();
+        if (!selectedPaymentMethod) {
+          showToast('Please select a payment method.','error');
+          return;
+        }
+        const grandTotal = parseFloat(document.getElementById('grand-total').textContent);
+        fetch('/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            items: cartItems,
+            total: grandTotal,
+            address: selectedAddress,
+            payment: selectedPaymentMethod,
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Failed to proceed to checkout');
+            }
+            return response.text();
+          })
+          .then((html) => {
+            document.body.innerHTML = html;
+          })
+          .catch((error) => {
+            showToast('Internal Server Error, please try again', 'error');
+          });
+      }
+    </script>
+  </body>
+</html>

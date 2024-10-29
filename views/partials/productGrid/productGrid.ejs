@@ -1,0 +1,61 @@
+<section class="products">
+  <div
+    class="product-grid"
+    style="background: var(--nd-bg-color); border-radius: 10px; padding: 20px 0"
+  >
+    <% products.forEach(product => { %>
+    <div class="product-card">
+      <a href="/products/<%= product._id %>">
+        <img src="<%= product.image %>" alt="<%= product.name %>" />
+        <h3 style="margin-top: 4px"><%= product.name %></h3>
+        <div class="priceAndRating">
+          <h3
+            class="<%= product.quantity > 0 ? '' : 'text-red' %>"
+            style="color: <%= product.quantity > 0  ? ' #fff ' : ' #8f1804 ' %>"
+          >
+            <%= product.quantity > 0 ? `$${product.price}` : 'Sold Out' %>
+          </h3>
+
+          <p>
+            <!-- Rating display logic -->
+            <%= product.rating %> <% if (product.rating < 1) { %>
+            <i class="bx bx-star" style="color: gold"></i>
+            <% } else if (product.rating >= 1 && product.rating < 4) { %>
+            <i class="bx bxs-star-half" style="color: gold"></i>
+            <% } else { %>
+            <i class="bx bxs-star" style="color: gold"></i>
+            <% } %>
+          </p>
+        </div>
+      </a>
+
+      <div class="priceAndRating">
+        <% if(user){ const isInCart = user.cart.some(item =>
+        item.productId.toString() === product._id.toString()); %>
+        <!-- Cart icon -->
+        <i
+          class="<%= isInCart ? 'bx bxs-cart' : 'bx bx-cart-add' %> icons"
+          data-id="<%= product._id %>"
+          data-type="cart"
+          style="color: <%= isInCart ? ' #9c52fe ' : ' #ffffff ' %>"
+          onclick="toggleCart('<%= product._id %>', 1)"
+        ></i>
+        <% } %> <% if(user){ const isInWishlist = user.wishlist.some(item =>
+        item.productId.toString() === product._id.toString()); %>
+        <!-- Wishlist icon -->
+        <i
+          class="<%= isInWishlist ? 'bx bxs-heart' : 'bx bx-heart' %> icons"
+          data-id="<%= product._id %>"
+          data-type="wishlist"
+          style="color: <%= isInWishlist ? ' #9c52fe ' : ' #ffffff ' %>"
+          onclick="toggleWishlist('<%= product._id %>')"
+        ></i>
+        <% } %>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <div id="toast-container"></div>
+</section>
+
+<script src="/utils/frontFuncs.js"></script>

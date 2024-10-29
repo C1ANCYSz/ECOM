@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      footer {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        padding: 40px 5%;
+        font-size: 0.9rem;
+      }
+
+      .footer-menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin-bottom: 40px;
+      }
+
+      .footer-nav-column {
+        flex: 1;
+        min-width: 200px;
+        margin: 20px 0;
+      }
+
+      .footer-nav-container {
+        padding: 0;
+      }
+
+      .footer-nav-container .li-title {
+        font-weight: 600;
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+      }
+
+      .footer-nav-container li {
+        margin: 8px 0;
+      }
+
+      .footer-nav-container li a {
+        color: var(--text-color);
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .footer-nav-container li a:hover {
+        color: var(--main-color);
+      }
+
+      .subscribe p {
+        margin-bottom: 15px;
+      }
+
+      .subscribe .email {
+        display: flex;
+      }
+
+      #subscribe-input {
+        padding: 10px;
+        margin: 0;
+        border: none;
+        border-radius: 5px 0 0 5px;
+        outline: none;
+        font-size: 0.9rem;
+      }
+
+      #subscribe-btn {
+        padding: 10px 20px;
+        background-color: var(--main-color);
+        color: #222;
+        border: none;
+        border-radius: 0 5px 5px 0;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      #subscribe-btn:hover {
+        background-color: #0cc;
+      }
+
+      .social-media {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+
+      .social-media a {
+        color: var(--text-color);
+        font-size: 2rem;
+        margin: 0 10px;
+        transition: color 0.3s ease;
+      }
+
+      .social-media a:hover {
+        color: var(--main-color);
+      }
+
+      .lang-pay {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+
+      .language i {
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      .language i:hover {
+        color: var(--main-color);
+      }
+
+      .paying-methods i {
+        font-size: 2rem;
+        margin: 0 10px;
+      }
+
+      .paying-methods p {
+        display: inline;
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-left: 10px;
+      }
+
+      .copyright {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 0.8rem;
+        color: #aaa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="ext"></div>
+    <footer>
+      <div class="footer-menu">
+        <nav class="footer-nav-column">
+          <ul class="footer-nav-container">
+            <li class="li-title">SHOP</li>
+
+            <% categories.forEach(cat => { %>
+            <li><a href="/products/category/<%= cat %>"><%= cat %></a></li>
+            <% }) %>
+          </ul>
+        </nav>
+        <nav class="footer-nav-column">
+          <ul class="footer-nav-container">
+            <li class="li-title">COMPANY INFO</li>
+            <li><a href="#">About us</a></li>
+            <li><a href="#">Our stores</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-nav-column">
+          <ul class="footer-nav-container">
+            <li class="li-title">SHOPPING INFO</li>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Account</a></li>
+            <li><a href="#">Shipping</a></li>
+            <li><a href="#">Return Policy</a></li>
+            <li><a href="#">Privacy and Security</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Gift Cards</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-nav-column subscribe">
+          <ul class="footer-nav-container">
+            <li class="li-title">SUBSCRIBE</li>
+            <p>
+              Take 5% off your first order when you sign up for our newsletter.
+            </p>
+            <span class="email"
+              ><input
+                type="email"
+                id="subscribe-input"
+                name="email"
+                placeholder="Email"
+              /><button id="subscribe-btn">Subscribe</button></span
+            >
+          </ul>
+        </nav>
+      </div>
+      <!-- Social media -->
+      <div class="social-media">
+        <a href="https://www.facebook.com/" target="_blank"
+          ><i class="fab fa-facebook-square"></i
+        ></a>
+        <a href="https://twitter.com/" target="_blank"
+          ><i class="fab fa-twitter-square"></i
+        ></a>
+        <a href="https://www.instagram.com/" target="_blank"
+          ><i class="fab fa-instagram"></i
+        ></a>
+        <a href="https://www.youtube.com/" target="_blank"
+          ><i class="fab fa-youtube-square"></i
+        ></a>
+        <a href="https://www.pinterest.com/" target="_blank"
+          ><i class="fab fa-pinterest-square"></i
+        ></a>
+      </div>
+      <div class="lang-pay">
+        <!-- Language -->
+
+        <!-- Paying methods -->
+        <div class="paying-methods">
+          <i class="fa-brands fa-cc-visa"></i>
+          <i class="fa-brands fa-cc-mastercard"></i>
+          <i class="fa-brands fa-cc-paypal"></i>
+          <i class="fa-brands fa-cc-apple-pay"></i>
+        </div>
+      </div>
+      <p class="copyright">Copyright &copy; 2024 | E-COM</p>
+    </footer>
+  </body>
+</html>

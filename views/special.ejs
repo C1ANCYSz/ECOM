@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>E-commerce Home</title>
+
+    <link rel="stylesheet" href="/styles/main.css" />
+    <style>
+      .down {
+        padding-top: 100px;
+      }
+
+      .offer {
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 20px;
+
+        text-transform: uppercase;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('partials/main/header', { user: user }); %>
+
+    <div class="down">
+      <h2 class="offer"><%= offer %></h2>
+      <%-include('partials/productGrid/productGrid', { products, user }); %>
+    </div>
+
+    <%- include('partials/main/footer', { user: user }); %>
+  </body>
+</html>

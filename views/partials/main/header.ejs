@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+      * {
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+      }
+      body {
+        background: var(--bg-color);
+        margin: 0;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        height: 60px;
+        background: #222;
+        color: #fff;
+        font-size: 18px;
+      }
+
+      .logo {
+        margin-left: 10px;
+        margin-right: 10px;
+      }
+
+      .logoAndSearch {
+        display: flex;
+        align-items: center;
+      }
+
+      .search-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        margin-left: 10px;
+      }
+
+      .search-bar {
+        display: flex;
+        align-items: center;
+      }
+
+      #search-input {
+        padding: 10px 40px 10px;
+        margin: 0;
+        background-color: #fff;
+        color: #000;
+        border: none;
+        border-radius: 25px;
+        outline: none;
+        min-width: 200px;
+        height: 40px;
+      }
+
+      :root {
+        --bg-color: #1f242d;
+        --nd-bg-color: #323946;
+        --text-color: #fff;
+        --main-color: #9c52fe;
+        --main-dark: #6a19d3;
+      }
+
+      .btx {
+        position: absolute;
+        right: 0px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 50%;
+        background-color: var(--main-dark);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.3s ease;
+      }
+
+      .btx:hover {
+        background-color: var(--main-color);
+      }
+
+      .btx i {
+        font-size: 16px;
+      }
+
+      .search-recommendations {
+        position: absolute;
+        top: 45px;
+        left: 0;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        display: none;
+      }
+
+      .search-recommendations.visible {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .search-recommendation-item {
+        padding: 8px 12px;
+        cursor: pointer;
+        color: #000;
+      }
+
+      .search-recommendation-item:hover {
+        background-color: #9c52fe;
+        color: white;
+      }
+
+      .menu {
+        display: flex;
+        align-items: center;
+        column-gap: 20px;
+        list-style: none;
+        margin-right: 20px;
+      }
+
+      .menu li i {
+        color: #fff;
+        transition: color 0.3s ease, background-color 0.4s ease;
+      }
+
+      .menu li i:hover {
+        color: #9c52fe;
+      }
+
+      .ext {
+        background-color: var(--main-color);
+        min-height: 3px;
+      }
+      .parasiteParent {
+        position: relative;
+      }
+      .parasite {
+        position: absolute;
+        top: -25px;
+        right: -10px;
+        color: #9c52fe;
+        border-radius: 50%;
+        padding: 5px;
+        font-size: 0.8rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hdr">
+      <header>
+        <div class="logoAndSearch">
+          <a href="/" class="logo">
+            <h1 style="color: white">E-COM</h1>
+          </a>
+          <div class="search-container">
+            <form
+              action="/search"
+              method="GET"
+              class="search-bar"
+              onsubmit="return false;"
+            >
+              <input
+                type="text"
+                name="query"
+                placeholder="Search products..."
+                aria-label="Search"
+                id="search-input"
+                oninput="fetchRecommendations(this.value)"
+                autocomplete="off"
+              />
+              <button class="btx" type="submit">
+                <i class="bx bx-search"></i>
+              </button>
+            </form>
+            <div class="search-recommendations" id="recommendations-box"></div>
+          </div>
+        </div>
+        <nav>
+          <ul class="menu">
+            <% if (user) { %>
+            <li>
+              <a href="/profile">
+                <img
+                  src="<%= user.img %>"
+                  style="height: 40px; width: 40px"
+                  alt="Profile Image"
+                />
+              </a>
+            </li>
+
+            <li>
+              <div class="parasiteParent">
+                <a href="/wishlist"
+                  ><i class="bx bxs-heart-circle icons"></i>
+                  <div class="parasite"><%= user.wishlist.length %></div>
+                </a>
+              </div>
+            </li>
+            <li>
+              <div class="parasiteParent">
+                <a href="/cart"
+                  ><i class="bx bxs-cart-alt icons"></i>
+                  <div class="parasite"><%= user.cart.length %></div>
+                </a>
+              </div>
+            </li>
+            <li>
+              <a href="/auth/logout"
+                ><i class="bx bxs-log-out bx-rotate-180 icons"></i
+              ></a>
+            </li>
+            <% } else { %>
+            <li><a href="/login">Login</a></li>
+            <li><a href="/signup">Signup</a></li>
+            <% } %>
+          </ul>
+        </nav>
+      </header>
+      <div class="ext"></div>
+    </div>
+
+    <script>
+      async function fetchRecommendations(query) {
+        const recommendationsBox = document.getElementById(
+          'recommendations-box'
+        );
+
+        if (query.length < 2) {
+          recommendationsBox.style.display = 'none';
+          return;
+        }
+
+        try {
+          const response = await fetch(
+            `/search/search-suggestions?query=${encodeURIComponent(query)}`
+          );
+          const products = await response.json();
+
+          recommendationsBox.innerHTML = '';
+
+          if (products.length > 0) {
+            products.forEach((product) => {
+              const suggestionItem = document.createElement('div');
+              suggestionItem.className = 'search-recommendation-item';
+              suggestionItem.innerHTML = `${product.name} in <strong>${product.category}</strong>`;
+              suggestionItem.onclick = () => {
+                window.location.href = `/products/${product._id}`;
+              };
+              recommendationsBox.appendChild(suggestionItem);
+            });
+
+            recommendationsBox.style.display = 'flex';
+            recommendationsBox.style.flexDirection = 'column';
+            recommendationsBox.classList.add('visible');
+          } else {
+            recommendationsBox.style.display = 'none';
+          }
+        } catch (error) {
+          console.error('Error fetching product recommendations:', error);
+        }
+      }
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+          document.getElementById('recommendations-box').style.display = 'none';
+        }
+      });
+    </script>
+    <script src="/utils/frontFuncs.js"></script>
+  </body>
+</html>
