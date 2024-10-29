@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-const Product = require('./models/Product'); // Adjust this path based on your project structure
+const Product = require('./models/Product');
 const { faker } = require('@faker-js/faker');
 
-// MongoDB connection URL
 const mongoURI = 'mongodb://localhost:27017/ecom';
 
 async function connectToDB() {
@@ -28,20 +27,19 @@ async function createProducts() {
       'Automotive',
     ];
 
-    // Create 100 products, with the first 10 being featured
     const products = [];
     for (let i = 0; i < 100; i++) {
       const product = new Product({
         name: faker.commerce.productName(),
-        price: faker.commerce.price(10, 1000, 2), // Generates price between $10 and $1000
-        quantity: faker.number.int({ min: 1, max: 100 }), // Random stock quantity between 1 and 100
-        category: faker.helpers.arrayElement(categories), // Randomly select a category from the list
+        price: faker.commerce.price(10, 1000, 2),
+        quantity: faker.number.int({ min: 1, max: 100 }),
+        category: faker.helpers.arrayElement(categories),
         description: faker.commerce.productDescription(),
-        image: 'https://via.placeholder.com/300', // Placeholder image URL
-        featured: i < 10, // Make the first 10 products featured
+        image: 'https://via.placeholder.com/300',
+        featured: i < 10,
         rating: faker.number
           .float({ min: 1, max: 5, precision: 0.1 })
-          .toFixed(1), // Generates a random rating between 1 and 5
+          .toFixed(1),
       });
 
       products.push(product);
@@ -56,7 +54,6 @@ async function createProducts() {
   }
 }
 
-// Execute the script
 (async () => {
   await connectToDB();
   await createProducts();
