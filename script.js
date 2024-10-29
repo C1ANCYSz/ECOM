@@ -28,7 +28,7 @@ async function createProducts() {
     ];
 
     const products = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 120; i++) {
       const product = new Product({
         name: faker.commerce.productName(),
         price: faker.commerce.price(10, 1000, 2),
