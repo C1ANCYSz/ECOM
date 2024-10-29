@@ -30,7 +30,7 @@
       <section class="cart-section">
         <h2><%= products.length %> items</h2>
         <% if (products.length > 0) { %>
-        <table class="cart-table"></table>
+        <table class="cart-table">
           <thead>
             <tr>
               <th>Img</th>
@@ -45,22 +45,42 @@
             <% products.forEach((item, index) => { %>
             <tr data-index="<%= index %>">
               <td>
-                <img src="<%= item.image %>" alt="<%= item.name %>" style="width: 100px" />
+                <img
+                  src="<%= item.image %>"
+                  alt="<%= item.name %>"
+                  style="width: 100px"
+                />
               </td>
               <td>
                 <a href="/products/<%=item.id%>"><%= item.name %> </a>
               </td>
               <td>
                 <div class="flexme">
-                  <i class="bx bx-minus plmn" style="font-weight: 900" onclick="decreaseQuantity('<%= index %>', '<%= item.price %>')"></i>
-                  <label id="quantity-label-<%= index %>" style="margin: 0 10px; color: white"><%= item.quantity %></label>
-                  <i class="bx bx-plus plmn" onclick="increaseQuantity('<%= index %>', '<%= item.price %>')"></i>
+                  <i
+                    class="bx bx-minus plmn"
+                    style="font-weight: 900"
+                    onclick="decreaseQuantity('<%= index %>', '<%= item.price %>')"
+                  ></i>
+                  <label
+                    id="quantity-label-<%= index %>"
+                    style="margin: 0 10px; color: white"
+                    ><%= item.quantity %></label
+                  >
+                  <i
+                    class="bx bx-plus plmn"
+                    onclick="increaseQuantity('<%= index %>', '<%= item.price %>')"
+                  ></i>
                 </div>
               </td>
               <td>$<%= item.price %></td>
-              <td id="total-<%= index %>">$<%= (item.price * item.quantity).toFixed(2) %></td>
+              <td id="total-<%= index %>">
+                $<%= (item.price * item.quantity).toFixed(2) %>
+              </td>
               <td>
-                <button onclick="deleteItem('<%= index %>');" class="btn-secondary">
+                <button
+                  onclick="deleteItem('<%= index %>');"
+                  class="btn-secondary"
+                >
                   <i class="bx bx-x"></i>
                 </button>
               </td>
@@ -74,15 +94,20 @@
       </section>
       <section class="total-section">
         <h3>
-          Total Amount: $<span id="grand-total"><%= products.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2) %></span>
+          Total Amount: $<span id="grand-total"
+            ><%= products.reduce((acc, item) => acc + item.price *
+            item.quantity, 0).toFixed(2) %></span
+          >
         </h3>
-        <button onclick="proceedToCheckout();" class="btn-primary">Proceed to Checkout</button>
+        <button onclick="proceedToCheckout();" class="btn-primary">
+          Proceed to Checkout
+        </button>
       </section>
     </div>
     <div id="toast-container"></div>
     <script src="/utils/frontFuncs.js"></script>
     <%- include('partials/main/footer', { user: user }); %>
-   
+
     <script>
       const products = <%- JSON.stringify(products) %> || [];
       function proceedToCheckout() {
