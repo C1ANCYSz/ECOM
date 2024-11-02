@@ -162,3 +162,17 @@ exports.logout = async (req, res) => {
 
   res.redirect('/');
 };
+
+exports.restrictTo = (...emails) => {
+  console.log(emails);
+  return (req, res, next) => {
+    if (!emails.includes(req.user.email)) {
+      return res.status(403).json({
+        success: false,
+        message:
+          'You do not have permission to perform this action, unauthorized',
+      });
+    }
+    next();
+  };
+};

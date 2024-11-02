@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>Manage Orders</h1>
+    <table>
+        <tr>
+            <th>Order ID</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+        <% orders.forEach(order => { %>
+            <tr>
+                <td><%= order._id %></td>
+                <td><%= order.customerId %></td>
+                <td><%= order.total %>$</td>
+                <td><%= order.status %></td>
+                <td>
+                    <a href="/admin/orders/<%= order._id %>/edit">Edit</a>
+                    <form action="/admin/orders/<%= order._id %>?_method=DELETE" method="POST">
+                        <button>Delete</button>
+                    </form>
+                </td>
+            </tr>
+        <% }) %>
+</body>
+</html>

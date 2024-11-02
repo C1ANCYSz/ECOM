@@ -10,6 +10,8 @@ const wishlistRoute = require('./Routes/wishlistRoute');
 const cartRoute = require('./Routes/cartRoute');
 const searchRoute = require('./Routes/searchRoute');
 const customerRoute = require('./Routes/customerRoute');
+const adminRoute = require('./Routes/adminRoute');
+const { restrictTo, protect } = require('./Controllers/authControllers');
 
 const app = express();
 
@@ -28,6 +30,8 @@ app.get('/favicon.ico', (req, res) => {
 });
 
 app.use('/', getters);
+
+app.use('/admin', protect, restrictTo('clancy@gmail.com'), adminRoute);
 
 app.use('/wishlist', wishlistRoute);
 

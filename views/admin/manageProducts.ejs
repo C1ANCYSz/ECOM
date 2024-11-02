@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Products</title>
+  </head>
+  <body>
+    <h1>Manage Products</h1>
+    <a href="/admin/addProduct">Add Product</a>
+    <table>
+      <thead>
+        <tr>
+          <th>Product ID</th>
+          <th>Product Name</th>
+          <th>Product Price</th>
+          <th>Product Quantity</th>
+          <th>Product Description</th>
+          <th>Product Image</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% products.forEach(product => { %>
+        <tr>
+          <td><%= product.id %></td>
+          <td><%= product.name %></td>
+          <td><%= product.price %></td>
+          <td><%= product.quantity %></td>
+          <td><%= product.description %></td>
+          <td>
+            <img
+              src="/<%= product.image %>"
+              alt="<%= product.name %>"
+              style="width: 100px; height: 100px"
+            />
+          </td>
+          <td>
+            <a href="/admin/editProduct/<%= product.id %>">Edit</a>
+            <a href="/admin/deleteProduct/<%= product.id %>">Delete</a>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+    <a href="/admin">Back</a>
+  </body>
+</html>

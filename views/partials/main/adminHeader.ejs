@@ -199,52 +199,12 @@
         </div>
         <nav>
           <ul class="menu">
-            <% if (user) { %> <% if (user.email==='clancy@gmail.com') { %>
-            <li>
-              <a href="/admin"> Admin Panel </a>
-            </li>
-            <li>
-              <a href="/"> Homepage </a>
-            </li>
-            <li>
-              <a href="/auth/logout"
-                ><i class="bx bxs-log-out bx-rotate-180 icons"></i
-              ></a>
-            </li>
-            <% }else{ %>
+            <% if (user) { %>
 
-            <li>
-              <a href="/profile">
-                <img
-                  src="<%= user.img %>"
-                  style="height: 40px; width: 40px"
-                  alt="Profile Image"
-                />
-              </a>
-            </li>
+            <li><a href="/admin">Admin</a></li>
+            <li><a href="/">Homepage</a></li>
 
-            <li>
-              <div class="parasiteParent">
-                <a href="/wishlist"
-                  ><i class="bx bxs-heart-circle icons"></i>
-                  <div class="parasite"><%= user.wishlist.length %></div>
-                </a>
-              </div>
-            </li>
-            <li>
-              <div class="parasiteParent">
-                <a href="/cart"
-                  ><i class="bx bxs-cart-alt icons"></i>
-                  <div class="parasite"><%= user.cart.length %></div>
-                </a>
-              </div>
-            </li>
-            <li>
-              <a href="/auth/logout"
-                ><i class="bx bxs-log-out bx-rotate-180 icons"></i
-              ></a>
-            </li>
-            <% } %> <% } else { %>
+            <% } else { %>
             <li><a href="/login">Login</a></li>
             <li><a href="/signup">Signup</a></li>
             <% } %>

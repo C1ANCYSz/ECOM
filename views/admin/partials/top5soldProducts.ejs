@@ -1,0 +1,16 @@
+<section>
+  top 5 sold products
+  <ul class="product-list">
+    <% topProducts.forEach(product => { %>
+    <li class="product-item">
+      <img
+        src="<%= product.image %>"
+        alt="<%= product.name %>"
+        style="height: 100px"
+      />
+      <span class="product-name"><%= product.name %></span>
+      <p class="product-sold">Total Sold: <%= product.totalSold %></p>
+    </li>
+    <% }) %>
+  </ul>
+</section>

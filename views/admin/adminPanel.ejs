@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Panel</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <link
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+      .containerr {
+        display: inline-flex; /* Only take up as much space as the content inside */
+
+        justify-content: center;
+        column-gap: 24px;
+        row-gap: 24px;
+        padding: 24px;
+        background-color: var(--bg-color);
+        border-radius: 16px; /* Optional: add rounded corners */
+      }
+      .container-section {
+        max-height: fit-content;
+      }
+
+      .card {
+        border: 2px solid var(--main-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+
+        border-radius: 16px;
+
+        padding: 48px;
+        color: white;
+        font-size: larger;
+        background: var(--nd-bg-color);
+        transition: transform 0.3s ease, background 0.6s ease,
+          border-color 0.3s ease;
+      }
+
+      .card:hover {
+        transform: scale(1.1);
+        background: var(--main-dark);
+      }
+
+      .card box-icon {
+        size: 250px;
+      }
+
+      .product-list {
+        list-style-type: none;
+        padding: 0;
+      }
+      .product-item {
+        margin: 10px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: var(--nd-bg-color);
+        display: inline-block;
+        align-items: center;
+        width: auto;
+        max-width: 100%; /* Ensures it doesn't exceed the screen width */
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow */
+      }
+
+      .product-name {
+        font-weight: bold;
+        font-size: 1.2em;
+      }
+      .product-sold {
+        color: #b9b9b9;
+      }
+
+      .user-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+      }
+      .user-card {
+        width: 200px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .user-card img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 10px;
+      }
+      .user-name {
+        font-weight: bold;
+        font-size: 1.2em;
+        margin: 10px 0;
+      }
+      .order-count {
+        color: #666;
+      }
+
+      section {
+        margin: 20px;
+        padding: 20px;
+        border: 2px solid var(--main-color);
+        border-radius: 16px;
+        background: var(--nd-bg-color);
+      }
+
+      .topUsers li {
+        display: inline-flex; /* Change from flex to inline-flex */
+        flex-direction: row; /* Maintain row direction */
+        gap: 20px; /* Space between items */
+        justify-content: center; /* Center items */
+        align-items: center; /* Align items vertically */
+        border: 2px solid var(--main-color);
+        border-radius: 16px;
+        padding: 10px; /* Add padding if needed for better spacing inside the border */
+        margin-bottom: 5px; /* Optional: Add margin to separate items */
+      }
+      .topUsers ul {
+        height: fit-content;
+        width: fit-content;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+
+      .topUsers img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+      }
+      .collector {
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+      }
+      .topUsers {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-height: fit-content;
+        flex-direction: column;
+        flex: 1;
+      }
+      .top5 {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        flex: 1;
+        max-height: fit-content;
+        background-color: var(--nd-bg-color);
+      }
+      .top5 li {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid var(--main-dark);
+        border-radius: 8px;
+        background-color: var(--bg-color);
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .container-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .analysis {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 40px;
+        max-height: 600px; /* Set a max height to contain content */
+        overflow-y: auto;
+        margin: 0;
+        border: none;
+      }
+
+      .pie-chart {
+        flex: 1;
+        max-width: 444px; /* Set a reasonable width */
+      }
+
+      .chart {
+        flex: 1;
+        max-width: 800px; /* Set a reasonable width */
+        max-height: 500px; /* Limit height to avoid overflow */
+        overflow: hidden; /* Prevent content from overflowing */
+      }
+
+      canvas {
+        width: 100% !important;
+        height: auto !important;
+      }
+
+      .theBody {
+        margin-top: 100px;
+      }
+    </style>
+  </head>
+  <body>
+    <%- include('../partials/main/header', { user: user }); %>
+
+    <div class="theBody">
+      <section class="collector" style="border: none; margin: 0">
+        <section class="top5">
+          <h3>Top 5 Products</h3>
+          <ul class="product-list">
+            <% topProducts.forEach(product => { %>
+            <li>
+              <a href="/products/<%=product.productId%>">
+                <span class="product-name"><%= product.name %></span>
+              </a>
+              <div
+                class="cont"
+                style="display: flex; flex-direction: row; gap: 18px"
+              >
+                <p class="product-sold">Total Sold: <%= product.totalSold %></p>
+                <p class="product-sold">
+                  rating: <%= product.rating %> <i class="bx bxs-star"></i>
+                </p>
+              </div>
+            </li>
+            <% }) %>
+          </ul>
+        </section>
+        <section class="topUsers">
+          <h2>Top 5 Users</h2>
+          <ul>
+            <% topUsers.forEach(user => { %>
+            <li>
+              <img src="<%= user.image %>" alt="<%= user.name %>'s picture" />
+              <h3 class="user-name"><%= user.name %></h3>
+              <p class="order-count">
+                <%= user.orderCount %><i class="bx bx-cart"></i>
+              </p>
+            </li>
+            <% }) %>
+          </ul>
+        </section>
+        <section class="container-section">
+          <div class="containerr">
+            <a href="/admin/manage-products">
+              <div class="card">
+                <i class="bx bx-box"></i>
+                <h3>products</h3>
+              </div>
+            </a>
+
+            <a href="/admin/manage-orders">
+              <div class="card">
+                <i class="bx bxs-box"></i>
+                <h3>orders</h3>
+              </div>
+            </a>
+
+            <a href="/admin/manage-users">
+              <div class="card">
+                <i class="bx bxs-box"></i>
+                <h3>Users</h3>
+              </div>
+            </a>
+          </div>
+        </section>
+      </section>
+
+      <section class="analysis">
+        <section class="pie-chart">
+          <h2>Sold By Category</h2>
+          <canvas id="categoryChart" width="400" height="400"></canvas>
+
+          <script>
+            // Prepare the data from the server
+            const categories = <%- JSON.stringify(categories) %>;
+
+            // Extract labels and data for the chart
+            const labels = categories.map(item => item.category);
+            const data = categories.map(item => item.count);
+
+            // Render the pie chart
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(ctx, {
+              type: 'pie',
+              data: {
+                labels: labels,
+                datasets: [{
+                  label: 'count',
+                  data: data,
+                  backgroundColor: [
+                   'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                  ],
+                  borderColor: [
+                    'black',
+                    'black',
+                    'black',
+                    'black',
+                    'black',
+                    'black'
+                  ],
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    position: 'top',
+                  },
+
+                }
+              }
+            });
+          </script>
+        </section>
+        <section class="chart">
+          <div class="buttons">
+            <button onclick="changeChartType('daily')">Daily</button>
+            <button onclick="changeChartType('weekly')">Weekly</button>
+            <button onclick="changeChartType('monthly')">Monthly</button>
+          </div>
+          <canvas id="statsChart" width="400" height="200"></canvas>
+        </section>
+      </section>
+    </div>
+  </body>
+  <script>
+    let chart = null;
+
+    async function fetchStatistics(type) {
+      try {
+        const response = await fetch(`/admin/sales-stats/${type}`);
+        const data = await response.json();
+
+        // Map the returned data to labels and total revenue
+        const labels = data.map((entry) => entry._id); // _id contains the formatted date
+        const totalRevenue = data.map((entry) => entry.totalSales); // totalSales is the sum of sales
+
+        return { labels, totalRevenue };
+      } catch (error) {
+        console.error('Error fetching statistics:', error);
+        return { labels: [], totalRevenue: [] }; // Return empty arrays on error
+      }
+    }
+
+    async function updateChart(type) {
+      const { labels, totalRevenue } = await fetchStatistics(type);
+
+      if (chart) {
+        chart.destroy(); // Destroy the previous chart instance
+      }
+
+      const ctx = document.getElementById('statsChart').getContext('2d');
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Total Revenue',
+              data: totalRevenue,
+              backgroundColor: 'rgba(75, 192, 192, 0.5)', // Semi-transparent fill
+              borderColor: 'rgba(75, 192, 192, 1)',
+              borderWidth: 2,
+              fill: true, // Fill the area under the line
+              pointRadius: 5, // Larger points
+              pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            title: {
+              display: true,
+              text: `Bill Statistics (${
+                type.charAt(0).toUpperCase() + type.slice(1)
+              })`,
+              color: 'white',
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker tooltip
+              titleColor: 'white',
+              bodyColor: 'white',
+            },
+          },
+          interaction: {
+            mode: 'index',
+            intersect: false,
+          },
+          scales: {
+            x: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Date',
+                color: 'white',
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)', // Lighter grid lines
+              },
+              ticks: {
+                color: 'white',
+              },
+            },
+            y: {
+              display: true,
+              title: {
+                display: true,
+                text: 'Value',
+                color: 'white',
+              },
+              grid: {
+                color: 'rgba(255, 255, 255, 0.1)', // Lighter grid lines
+              },
+              ticks: {
+                color: 'white',
+                beginAtZero: true, // Start Y-axis at 0
+              },
+            },
+          },
+        },
+      });
+    }
+
+    function changeChartType(type) {
+      updateChart(type);
+    }
+
+    // Initialize the chart with daily data by default
+    updateChart('daily');
+  </script>
+</html>

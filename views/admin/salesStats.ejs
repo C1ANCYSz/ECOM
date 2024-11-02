@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الإحصائيات</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/styles/main.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      canvas {
+        max-width: 100%;
+        height: 100px;
+        margin: 20px;
+        border-radius: 10px; /* Rounded corners */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
+      }
+      .buttons {
+        margin: 20px;
+      }
+      button {
+        margin-top: 40px;
+        padding: 10px 20px;
+        cursor: pointer;
+        background-color: #7289da; /* Discord-like color */
+        color: white;
+        border: none;
+        border-radius: 25px; /* More rounded corners */
+        transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for button */
+      }
+      button:hover {
+        background-color: #5a6eab; /* Darker shade on hover */
+        transform: translateY(-2px); /* Lift effect on hover */
+      }
+
+      @media screen and (max-width: 768px) {
+        body {
+          padding-top: 20px;
+        }
+        canvas {
+          height: 200px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="buttons">
+      <button onclick="changeChartType('daily')">Daily</button>
+      <button onclick="changeChartType('weekly')">Weekly</button>
+      <button onclick="changeChartType('monthly')">Monthly</button>
+    </div>
+
+    <canvas id="statsChart" width="400" height="200"></canvas>
+    <script>
+      let chart = null;
+
+      async function fetchStatistics(type) {
+        try {
+          const response = await fetch(`/admin/sales-stats/${type}`);
+          const data = await response.json();
+
+          // Map the returned data to labels and total revenue
+          const labels = data.map((entry) => entry._id); // _id contains the formatted date
+          const totalRevenue = data.map((entry) => entry.totalSales); // totalSales is the sum of sales
+
+          return { labels, totalRevenue };
+        } catch (error) {
+          console.error('Error fetching statistics:', error);
+          return { labels: [], totalRevenue: [] }; // Return empty arrays on error
+        }
+      }
+
+      async function updateChart(type) {
+        const { labels, totalRevenue } = await fetchStatistics(type);
+
+        if (chart) {
+          chart.destroy(); // Destroy the previous chart instance
+        }
+
+        const ctx = document.getElementById('statsChart').getContext('2d');
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: 'Total Revenue',
+                data: totalRevenue,
+                backgroundColor: 'rgba(75, 192, 192, 0.5)', // Semi-transparent fill
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: true, // Fill the area under the line
+                pointRadius: 5, // Larger points
+                pointBackgroundColor: 'rgba(75, 192, 192, 1)',
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              title: {
+                display: true,
+                text: `Bill Statistics (${
+                  type.charAt(0).toUpperCase() + type.slice(1)
+                })`,
+                color: 'white',
+              },
+              tooltip: {
+                mode: 'index',
+                intersect: false,
+                backgroundColor: 'rgba(0, 0, 0, 0.7)', // Darker tooltip
+                titleColor: 'white',
+                bodyColor: 'white',
+              },
+            },
+            interaction: {
+              mode: 'index',
+              intersect: false,
+            },
+            scales: {
+              x: {
+                display: true,
+                title: {
+                  display: true,
+                  text: 'Date',
+                  color: 'white',
+                },
+                grid: {
+                  color: 'rgba(255, 255, 255, 0.1)', // Lighter grid lines
+                },
+                ticks: {
+                  color: 'white',
+                },
+              },
+              y: {
+                display: true,
+                title: {
+                  display: true,
+                  text: 'Value',
+                  color: 'white',
+                },
+                grid: {
+                  color: 'rgba(255, 255, 255, 0.1)', // Lighter grid lines
+                },
+                ticks: {
+                  color: 'white',
+                  beginAtZero: true, // Start Y-axis at 0
+                },
+              },
+            },
+          },
+        });
+      }
+
+      function changeChartType(type) {
+        updateChart(type);
+      }
+
+      // Initialize the chart with daily data by default
+      updateChart('daily');
+    </script>
+  </body>
+</html>

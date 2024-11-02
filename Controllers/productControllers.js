@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const Order = require('../models/Order');
 
 exports.getAllProducts = async (req, res) => {
   try {
@@ -259,6 +260,192 @@ exports.getSpecialProducts = async (req, res) => {
     res.status(500).json({
       success: false,
       message: err.message,
+    });
+  }
+};
+
+exports.getCategoryOfSoldProducts = async (req, res) => {
+  try {
+    const categories = await Order.aggregate([
+      // Step 1: Unwind the products array
+      { $unwind: '$products' },
+
+      // Step 2: Lookup to join Product collection by productId
+      {
+        $lookup: {
+          from: 'products',
+          localField: 'products.productId',
+          foreignField: '_id',
+          as: 'productDetails',
+        },
+      },
+
+      // Step 3: Unwind productDetails (each product should have only one detail)
+      { $unwind: '$productDetails' },
+
+      // Step 4: Group by category and sum quantities
+      {
+        $group: {
+          _id: '$productDetails.category',
+          count: { $sum: '$products.quantity' },
+        },
+      },
+
+      // Step 5: Project results into desired format
+      {
+        $project: {
+          _id: 0,
+          category: '$_id',
+          count: '$count',
+        },
+      },
+    ]);
+
+    return categories;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.getTopSoldProducts = async (req, res) => {
+  try {
+    const topProducts = await Order.aggregate([
+      // Step 1: Unwind the products array to get individual products
+      { $unwind: '$products' },
+
+      // Step 2: Group by productId and calculate total quantity sold for each product
+      {
+        $group: {
+          _id: '$products.productId',
+          totalSold: { $sum: '$products.quantity' },
+        },
+      },
+
+      // Step 3: Sort by totalSold in descending order
+      { $sort: { totalSold: -1 } },
+
+      // Step 4: Limit to top 5 products
+      { $limit: 5 },
+
+      // Step 5: Lookup to get product details from the Product collection
+      {
+        $lookup: {
+          from: 'products',
+          localField: '_id',
+          foreignField: '_id',
+          as: 'productDetails',
+        },
+      },
+
+      // Step 6: Unwind productDetails (each product should have only one detail)
+      { $unwind: '$productDetails' },
+
+      // Step 7: Project the fields we need
+      {
+        $project: {
+          _id: 0,
+          productId: '$_id',
+          image: '$productDetails.image',
+          name: '$productDetails.name',
+          totalSold: '$totalSold',
+          rating: '$productDetails.rating',
+        },
+      },
+    ]);
+
+    return topProducts;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.getTopUsers = async (req, res) => {
+  try {
+    const topUsers = await Order.aggregate([
+      // Step 1: Group by customerId and count the number of orders per customer
+      {
+        $group: {
+          _id: '$customerId',
+          orderCount: { $sum: 1 },
+        },
+      },
+
+      // Step 2: Sort by orderCount in descending order
+      { $sort: { orderCount: -1 } },
+
+      // Step 3: Limit to top 10 users
+      { $limit: 10 },
+
+      // Step 4: Lookup to get user details from the Customer collection
+      {
+        $lookup: {
+          from: 'customers', // Collection name for customers
+          localField: '_id', // customerId from the orders
+          foreignField: '_id', // _id in the customers collection
+          as: 'userDetails', // Output field name for joined details
+        },
+      },
+
+      // Step 5: Unwind userDetails to get a single document per user
+      { $unwind: '$userDetails' },
+
+      // Step 6: Project the fields we want
+      {
+        $project: {
+          _id: 0,
+          customerId: '$_id',
+          name: '$userDetails.name',
+          image: '$userDetails.img',
+          orderCount: '$orderCount',
+        },
+      },
+    ]);
+
+    return topUsers;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+exports.getSalesData = async (req, res) => {
+  try {
+    const period = req.params.period || 'daily';
+    let dateFormat;
+
+    // Define date format based on the period
+    if (period === 'daily') {
+      dateFormat = {
+        $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+      }; // e.g., "2024-11-01"
+    } else if (period === 'weekly') {
+      dateFormat = {
+        $dateToString: { format: '%Y-%U', date: '$createdAt' }, // e.g., "2024-45" (Year-Week)
+      };
+    } else if (period === 'monthly') {
+      dateFormat = {
+        $dateToString: { format: '%Y-%m', date: '$createdAt' }, // e.g., "2024-11"
+      };
+    } else {
+      throw new Error('Invalid period specified'); // Handle invalid period input
+    }
+
+    const salesData = await Order.aggregate([
+      // Step 1: Group by the formatted date based on the selected period
+      {
+        $group: {
+          _id: dateFormat,
+          totalSales: { $sum: '$total' }, // Sum of the total field in each order
+        },
+      },
+      // Step 2: Sort by date
+      { $sort: { _id: 1 } }, // Sort in ascending order by the date bucket
+    ]);
+
+    res.json(salesData);
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };
